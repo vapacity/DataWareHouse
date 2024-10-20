@@ -68,12 +68,12 @@ class MoviesSpider(scrapy.Spider):
             , 'Release date', 'Rated', 'Runtime', 'Description', 'Contributors'
             , 'Actors', 'Directors', 'Producers', 'Media Format', 'Genres'
             , 'Customer Reviews', 'IMDb', 'Number of discs', 'Studio'
-            ,'Director','Run time','Genre','Audio languages','Released']
+            ,'Director','Run time','Genre','Audio languages','Released','Contributor']
         itemKeys = ['ASIN', 'Title', 'Subtitles', 'Language', 'Release_year'
             , 'Release_date', 'Rated', 'Run_time', 'Description', 'Contributors'
             , 'Actors', 'Directors', 'Producers', 'Media_Format', 'Genres'
             , 'Customer_Reviews', 'IMDb', 'Number_of_discs', 'Studio'
-            ,'Directors','Run_time','Genres','Language','Release_year']
+            ,'Directors','Run_time','Genres','Language','Release_year','Contributors']
 
         # 获取标题
         title = response.xpath('//*[@id="productTitle"]/text()').get()
@@ -121,7 +121,21 @@ class MoviesSpider(scrapy.Spider):
                     td_string = td.xpath('.//span/text()').get()
                     if td_string and td_string in productDetails:
                         # 获得td下对应的内容
-                        following_span_text = td.xpath('./following-sibling::td[@class="a-span9"]/span/text()').get()
+                        following_span = td.xpath('./following-sibling::td[@class="a-span9"]')
+                        # 检查following_span是否存在且只包含一个span标签
+                        if following_span and len(following_span.xpath('.//span').getall()) == 1:
+                            following_span_text = following_span.xpath('.//span/text()').get()
+                            if following_span_text:
+                                following_span_text = following_span_text.strip()
+                        else:
+                            # 如果不只包含一个span标签，找到页面中id包含“a-popover-content”的第一个div
+                            following_span_text = following_span.xpath('.//span[@class="a-truncate-full a-offscreen"]/text()').get()
+                            # 去除前后的单引号或双引号
+                            if following_span_text:
+                                # 去除前后的单引号
+                                following_span_text = following_span_text.replace("'","")
+                                # 去除前后的双引号
+                                following_span_text = following_span_text.replace('"',"")
                         if following_span_text:
                             index = productDetails.index(td_string)
                             corresponding_string = itemKeys[index]
@@ -196,6 +210,11 @@ class MoviesSpider(scrapy.Spider):
 
                 if customer_reviews_text:
                     item['Customer_Reviews'] = customer_reviews_text
+
+            df = response.meta['df']
+            index = response.meta['index']
+            df.at[index, 'record'] = 1
+            df.to_csv("E:\Tongji\大三上学期\数据存储与管理\DataWareHouse\\asins.csv", index=False)
 
         else:
             title = response.xpath('//*[@id="main"]/div[1]/div/div/div[2]/div/div/div/div[1]/h1/text()').get()
@@ -274,23 +293,10 @@ class MoviesSpider(scrapy.Spider):
             combined_aria_labels = ", ".join(aria_labels)
             item['Genres'] = combined_aria_labels
 
-            # 获取语言
-            # language = response.xpath(
-            #     '//*[@id="productOverview_feature_div"]/div/table/tbody/tr[@class="a-spacing-small po-language"]/td[@class="a-span9"]/span[@class="a-size-base po-break-word"]/text()').get()
-            # if language:
-            #     item['Language'] = language.strip()
-            # else:
-            # language = response.xpath(
-            #     '//div[@id="btf-product-details"]//dt[span[text()="Audio languages"]]/following-sibling::dd/text()').get()
-            # if language:
-            #     item['Language'] = language.strip()
-
-        df = response.meta['df']
-        index = response.meta['index']
-        df.at[index, 'record'] = 1
-        df.to_csv("E:\Tongji\大三上学期\数据存储与管理\DataWareHouse\\asins.csv", index=False)
-
+            df = response.meta['df']
+            index = response.meta['index']
+            df.at[index, 'record'] = 1
+            df.to_csv("E:\Tongji\大三上学期\数据存储与管理\DataWareHouse\\asins.csv", index=False)
         #返回item
-
         yield item
 
