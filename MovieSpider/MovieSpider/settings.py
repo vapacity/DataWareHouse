@@ -12,6 +12,8 @@ BOT_NAME = "MovieSpider"
 SPIDER_MODULES = ["MovieSpider.spiders"]
 NEWSPIDER_MODULE = "MovieSpider.spiders"
 
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.54 Safari/536.5'
+
 DOWNLOADER_MIDDLEWARES = {
     'MovieSpider.middlewares.MoviespiderDownloaderMiddleware': 543,  # 替换成你中间件的路径
 }
@@ -19,7 +21,7 @@ DOWNLOADER_MIDDLEWARES = {
 #USER_AGENT = "MovieSpider (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -33,7 +35,7 @@ ROBOTSTXT_OBEY = True
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-#COOKIES_ENABLED = False
+COOKIES_ENABLED = True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False

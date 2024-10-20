@@ -32,5 +32,20 @@ def process_ID(file_path, output_file):
 
     print(f"Total records processed: {count}")
 
-# 调用函数
-process_ID('movies.txt', 'test.csv')
+import pandas as pd
+
+# 将 file_path 替换为你 CSV 文件的实际路径
+file_path = "E:/Projects/AmazonDataWareHouse/asins.csv"
+
+# 读取 CSV 文件
+df = pd.read_csv(file_path)
+
+# 检查是否存在 'record' 列，如果不存在则初始化该列为 0
+if 'record' not in df.columns:
+    df['record'] = 0  # 初始化为 0，表示尚未爬取
+
+# 将修改后的 DataFrame 写回到 CSV 文件中
+df.to_csv(file_path, index=False)
+
+# 显示前几行确认修改成功
+print(df.head())
