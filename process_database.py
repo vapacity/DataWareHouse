@@ -32,5 +32,3 @@ def process_ID(file_path, output_file):
 
     print(f"Total records processed: {count}")
 
-# 调用函数
-process_ID('movies.txt', 'test.csv')
